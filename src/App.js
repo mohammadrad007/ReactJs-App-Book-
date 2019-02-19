@@ -17,11 +17,8 @@ class App extends Component {
     editBookModal : false
   }
   componentWillMount(){
-    axios("http://localhost:3000/books").then((response)=>{
-      this.setState({
-        books : response.data
-      })
-    })
+    this._refreshBooks();
+    
   }
   toggleNewBookModal(){
     this.setState({
@@ -44,10 +41,38 @@ class App extends Component {
     });
   }
   updateBook(){
-    
+    let {title, rating} = this.state.editBookData;
+    axios.put("http://localhost:3000/books" + this.state.editBookData.id, {
+      title,
+      rating
+    }).then((response)=>{
+      this._refreshBooks();
+      this.setState({
+        editBookModal : false,
+        editBookData : {
+          id: '',
+          title : '',
+          rating: ''
+      }
+      })
+    })
   }
   editBook(id, title, rating){
-    console.log(title)
+    this.setState({
+      editBookData: {id,title,rating},
+       editBookModal: ! this.state.editBookModal })
+  }
+  deleteBook(id){
+    axios.delete("http://localhost:3000/books" + id).then((response)=>{
+      _refreshBooks();
+    })
+  }
+  _refreshBooks(){
+    axios("http://localhost:3000/books").then((response)=>{
+      this.setState({
+        books : response.data
+      })
+    })
   }
   render() {
     let books = this.state.books.map((book)=>{
@@ -58,7 +83,7 @@ class App extends Component {
         <td>{book.rating}</td>
         <td>
           <Button color="success" size="sm" className="mr-2" onClick = {this.editBook.bind(this, book.id, book.title, book.rating)}>Edit</Button>
-          <Button color="danger" size="sm">Delete</Button>
+          <Button color="danger" size="sm" onClick = {this.deleteBook.bind(this, book.id)}>Delete</Button>
         </td>
      </tr>
       )
