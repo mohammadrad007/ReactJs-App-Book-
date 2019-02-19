@@ -64,7 +64,7 @@ class App extends Component {
   }
   deleteBook(id){
     axios.delete("http://localhost:3000/books" + id).then((response)=>{
-      _refreshBooks();
+      this._refreshBooks();
     })
   }
   _refreshBooks(){
